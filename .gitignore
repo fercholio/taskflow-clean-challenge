@@ -1,0 +1,36 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.swp
+TestResults/
+coverage*.xml
+*.coverage
+
+# Rider / VS Code
+.idea/
+.vscode/
+
+# Node / Vite
+node_modules/
+dist/
+.cache/
+.eslintcache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+appsettings.*.local.json
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Docker
+*.pid
