@@ -4,7 +4,7 @@
 
 A small Task Management system built as a .NET technical interview exercise — designed to be **read in 5 minutes** and **run with one command**.
 
-- **Backend:** ASP.NET Core 8 (Web API + Razor MVC), C# 12, raw `Npgsql` (no ORM).
+- **Backend:** ASP.NET Core 9 (Web API + Razor MVC), C# 13, raw `Npgsql` (no ORM).
 - **Frontend:** React 18 + Vite + TypeScript, TanStack React Query, Tailwind CSS.
 - **Database:** PostgreSQL 16.
 - **Auth:** JWT bearer tokens (HS256), `Microsoft.AspNetCore.Identity.PasswordHasher<T>` for hashing only.
@@ -128,7 +128,7 @@ taskflow-clean-challenge/
 ├── docs/                        USER-STORY, ARCHITECTURE, GENAI, ROADMAP.
 ├── .github/workflows/ci.yml     dotnet + node + docker pipelines.
 ├── docker-compose.yml           postgres + api + web.
-├── Dockerfile.api               sdk:8.0 → aspnet:8.0 multi-stage.
+├── Dockerfile.api               sdk:9.0 → aspnet:9.0 multi-stage.
 └── Dockerfile.web               node:20 build → nginx:1.27 static.
 ```
 

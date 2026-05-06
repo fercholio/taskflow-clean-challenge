@@ -13,7 +13,7 @@ flowchart LR
     subgraph Container["Docker network"]
       direction LR
       NGINX["nginx<br/>(serves SPA + /api proxy)"]
-      API["ASP.NET Core 8 API<br/>(Web API + Razor MVC)"]
+      API["ASP.NET Core 9 API<br/>(Web API + Razor MVC)"]
       DB[("PostgreSQL 16")]
     end
 
