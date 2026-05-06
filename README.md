@@ -1,60 +1,160 @@
 # TaskFlow — Clean Architecture Technical Challenge
 
-A small Task Management system built as a .NET technical interview exercise.
-Backend: ASP.NET Core 8 (Web API + MVC). Frontend: React + Vite + TypeScript. Storage: PostgreSQL via raw Npgsql (no ORM). Auth: JWT.
+[![CI](https://github.com/Fercho/taskflow-clean-challenge/actions/workflows/ci.yml/badge.svg)](https://github.com/Fercho/taskflow-clean-challenge/actions/workflows/ci.yml)
 
-> **Status:** scaffolding in progress. See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the day-by-day plan to the submission deadline (Fri Nov 8, 14:00 MX).
+A small Task Management system built as a .NET technical interview exercise — designed to be **read in 5 minutes** and **run with one command**.
+
+- **Backend:** ASP.NET Core 8 (Web API + Razor MVC), C# 12, raw `Npgsql` (no ORM).
+- **Frontend:** React 18 + Vite + TypeScript, TanStack React Query, Tailwind CSS.
+- **Database:** PostgreSQL 16.
+- **Auth:** JWT bearer tokens (HS256), `Microsoft.AspNetCore.Identity.PasswordHasher<T>` for hashing only.
+- **Architecture:** Clean Architecture (Domain ← Application ← Infrastructure ← Api).
+- **Testing:** xUnit, FluentAssertions, Moq, `WebApplicationFactory`, Testcontainers.
+
+> **Hard constraints honoured throughout the codebase:** no Entity Framework, no Dapper, no MediatR. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the rationale (ADR-001).
+
+---
 
 ## Quick links
 
-- 📋 Roadmap → [`docs/ROADMAP.md`](docs/ROADMAP.md)
-- 🤖 Copilot rules → [`.github/copilot-instructions.md`](.github/copilot-instructions.md)
-- 📖 User story → `docs/USER-STORY.md` *(coming)*
-- 🏛️ Architecture → `docs/ARCHITECTURE.md` *(coming)*
-- 🧠 GenAI process → `docs/GENAI.md` *(coming)*
+- 📖 User story → [`docs/USER-STORY.md`](docs/USER-STORY.md)
+- 🏛️ Architecture + ADRs → [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+- 🤖 GenAI process → [`docs/GENAI.md`](docs/GENAI.md)
+- 📋 Roadmap (planning artefact) → [`docs/ROADMAP.md`](docs/ROADMAP.md)
+- ⚙️ Repo-wide Copilot rules → [`.github/copilot-instructions.md`](.github/copilot-instructions.md)
 
-## Demo credentials (after seeding)
+## Demo credentials (after seed)
 
 | Email | Password |
 |---|---|
 | `demo@taskflow.dev` | `Demo123!` |
 
-## Run with Docker (one command, after Phase 6)
+---
+
+## Run with Docker (one command)
 
 ```bash
+cp .env.example .env
 docker compose up --build
 ```
 
-- Web: http://localhost:8080
-- API + Swagger: http://localhost:5080/swagger
-- Postgres: localhost:5432 (user `taskflow` / db `taskflow`)
+| Service | URL |
+|---|---|
+| SPA | http://localhost:8080 |
+| API + Swagger | http://localhost:5092/swagger |
+| Razor MVC home | http://localhost:5092/ |
+| PostgreSQL | localhost:5432 (user `taskflow`, db `taskflow`) |
+
+The SPA at `:8080` reverse-proxies `/api/*` to the API container, so the browser only talks to one origin.
 
 ## Run from source
 
+**API**
 ```bash
-# API
 dotnet run --project src/TaskFlow.Api
+# http://localhost:5092
+```
 
-# Web
+**SPA**
+```bash
 cd src/TaskFlow.Web
 npm install
 npm run dev
+# http://localhost:5173 (Vite proxies /api -> :5092)
 ```
+
+You will need a Postgres reachable at the connection string in `src/TaskFlow.Api/appsettings.json` — the easiest way is `docker compose up postgres`.
 
 ## Tests
 
 ```bash
+# Backend (Domain, Application, Infrastructure, Api)
 dotnet test
-cd src/TaskFlow.Web && npm test
+
+# Frontend type-check + production build
+cd src/TaskFlow.Web && npm run build
 ```
+
+CI runs the same gates plus a Docker image build on every push and PR — see [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+
+---
+
+## API surface
+
+Versioned under `/api/v1`.
+
+| Verb | Route | Auth | Purpose |
+|---|---|---|---|
+| `POST` | `/auth/register` | anon | Create user, returns JWT. |
+| `POST` | `/auth/login` | anon | Sign in, returns JWT. |
+| `GET` | `/ping` | anon | Liveness check. |
+| `GET` | `/ping/secure` | JWT | Demonstrates the auth boundary. |
+| `GET` | `/tasks` | JWT | List **my** tasks. |
+| `GET` | `/tasks/{id}` | JWT | Get one of my tasks. |
+| `POST` | `/tasks` | JWT | Create a task. |
+| `PUT` | `/tasks/{id}` | JWT | Update a task. |
+| `DELETE` | `/tasks/{id}` | JWT | Delete a task. |
+
+Sample curl (register → create):
+
+```bash
+TOKEN=$(curl -s http://localhost:5092/api/v1/auth/register \
+  -H 'content-type: application/json' \
+  -d '{"email":"maya@taskflow.dev","password":"S3cret-Pass!"}' \
+  | jq -r .accessToken)
+
+curl http://localhost:5092/api/v1/tasks \
+  -H "authorization: Bearer $TOKEN" \
+  -H 'content-type: application/json' \
+  -d '{"title":"Send invoice","description":null,"dueDateUtc":"2026-12-31T17:00:00Z"}'
+```
+
+Full schema is documented at `/swagger` when the API runs in Development.
+
+---
+
+## Repository layout
+
+```
+taskflow-clean-challenge/
+├── src/
+│   ├── TaskFlow.Domain/         Entities, value objects, domain errors. No deps.
+│   ├── TaskFlow.Application/    Use-case handlers, DTOs, abstractions, Result<T>.
+│   ├── TaskFlow.Infrastructure/ Npgsql repos, JWT, password hasher, migrations.
+│   ├── TaskFlow.Api/            Web API + Razor MVC home view, DI, Swagger.
+│   └── TaskFlow.Web/            React + Vite + TS SPA.
+├── tests/                       xUnit projects per layer.
+├── db/migrations/               Plain ordered .sql files applied at startup.
+├── docs/                        USER-STORY, ARCHITECTURE, GENAI, ROADMAP.
+├── .github/workflows/ci.yml     dotnet + node + docker pipelines.
+├── docker-compose.yml           postgres + api + web.
+├── Dockerfile.api               sdk:8.0 → aspnet:8.0 multi-stage.
+└── Dockerfile.web               node:20 build → nginx:1.27 static.
+```
+
+See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the dependency-rule diagram and ADRs.
+
+---
 
 ## Stack rationale (short)
 
-- **No EF / Dapper / MediatR** — explicit brief constraint; demonstrates control over SQL and pipeline composition.
-- **Clean Architecture** — Domain has zero deps; Application talks via ports; Infrastructure is swappable.
-- **TDD** — failing test first for Domain and Application layers; integration tests with `WebApplicationFactory` and Testcontainers.
-- **PostgreSQL + Npgsql** — aligns with the JD bonus stack and showcases raw ADO.NET fluency.
-- **React + Vite + TS** — fastest modern SPA stack, strong typing end-to-end with the API DTOs.
+- **Raw `Npgsql`, no EF/Dapper.** Brief constraint; payoff is reviewable, parameterised SQL with no surprises.
+- **Plain handler classes, no MediatR.** Brief constraint; payoff is a transparent request pipeline anyone can read top-to-bottom.
+- **Clean Architecture.** Domain has zero dependencies. Application talks to ports only. Infrastructure is swappable.
+- **TDD on Domain + Application.** Failing test first. Integration tests on Infrastructure (Testcontainers) and end-to-end via `WebApplicationFactory`.
+- **React + Vite + TS.** Strict TS end-to-end gives confidence the SPA matches the API contract.
+- **Tailwind CSS.** Fastest way to a polished, responsive UI without inventing a design system.
+
+## What I would do with more time
+
+1. **Refresh tokens + httpOnly cookie** instead of `localStorage` (mitigates XSS — flagged in ADR-003).
+2. **Rate limiting** on `/auth/login` and `/auth/register`.
+3. **OpenTelemetry** traces + Serilog structured logs shipped to a collector.
+4. **Role-based authorisation** (admin can list users) and audit log of mutations.
+5. **End-to-end tests with Playwright** covering register → create → edit → delete.
+6. **Task tags, search, pagination** and SignalR-based real-time updates.
+
+---
 
 ## License
 
