@@ -179,6 +179,25 @@
 
 ---
 
+## Phase 9 — Verification & GenAI guardrail (≈ 30 min)
+
+**Goal:** prove to the panel that GenAI was used to *build* **and** to *verify*. Generation without verification is speculation.
+
+- [ ] Re-run the verification battery from `.github/copilot-instructions.md` §10:
+  - `dotnet build TaskFlow.sln -c Release` → 0 warnings / 0 errors
+  - `dotnet test TaskFlow.sln -c Release --no-build` → 100% pass
+  - `dotnet format TaskFlow.sln --verify-no-changes` → `format: OK`
+  - `npm run build` in `src/TaskFlow.Web` → `dist/` emitted, no TS errors
+- [ ] Audit Phase 0–8 file inventory via `git log --since="24 hours ago"`.
+- [ ] Author `docs/PHASE-9-VERIFICATION.md` with the evidence table.
+- [ ] Append **Section 10 — Verification Discipline (GenAI guardrail)** to `.github/copilot-instructions.md`.
+- [ ] Update `docs/JOURNAL.md` with the verification checkpoint.
+- [ ] Commit: `docs(phase-9): verification report + GenAI verification guardrail`.
+
+**Exit state:** repo at `v1.0.0` is reproducibly verifiable in < 5 minutes by the panel.
+
+---
+
 ## §A — Bootstrap commands (copy/paste)
 
 ```pwsh

@@ -182,3 +182,34 @@ A feature is **done** only when **all** are true:
 - Optimize for **readability and testability**, not micro-perf.
 - If a request would take >30 minutes of pure scaffolding, propose a smaller vertical slice first.
 - If a requirement is ambiguous, ask **one** crisp clarifying question before generating code.
+
+---
+
+## 10. Verification Discipline (GenAI guardrail) — Phase 9
+
+> **Generation without verification is just speculation.** This section is what we show the panel: GenAI was used to *build* **and** to *verify*.
+
+Every GenAI-assisted change — no matter how small — must pass the **verification battery** before it is considered done:
+
+| Gate                | Command                                                            | Pass criterion                |
+|---------------------|--------------------------------------------------------------------|-------------------------------|
+| Build               | `dotnet build TaskFlow.sln -c Release`                             | 0 warnings, 0 errors          |
+| Tests               | `dotnet test TaskFlow.sln -c Release --no-build`                   | 100% pass                     |
+| Format              | `dotnet format TaskFlow.sln --verify-no-changes`                   | `format: OK`                  |
+| SPA build           | `npm run build` in `src/TaskFlow.Web`                              | `dist/` emitted, no TS errors |
+| Container sanity    | `docker compose up --build` (smoke, when touching infra/Docker/CI) | API + Web + DB all healthy    |
+
+### Rules
+
+1. **Never claim "done" from AI output alone.** A green editor is not a green build. A green build is not a green test run.
+2. **Re-run the battery after every AI-assisted change** that touches code, config, Dockerfiles, CI, or migrations.
+3. **Mismatch detection is mandatory.** When AI suggests a value (TFM, package version, env var name, route), cross-check against the actual solution before accepting. The Phase 8/9 net8 → net9 mismatch is the canonical example.
+4. **Evidence in the commit.** When verification reveals a fix, the commit message must reference the gate that caught it (e.g., `fix(ci): align setup-dotnet to 9.0.x — caught by docker job`).
+5. **Document the verification pass at every phase boundary.** Append to `docs/JOURNAL.md` with the verification numbers (tests passed, warnings, format status). See `docs/PHASE-9-VERIFICATION.md` for the canonical template.
+6. **Security-sensitive AI output gets manual review** even when the gates are green — auth flow, SQL strings, password handling, JWT signing keys. Cross-check against OWASP, never against vibes.
+
+### What this proves to the panel
+
+- The repository at `v1.0.0` is reproducibly verifiable in under 5 minutes.
+- GenAI accelerated authoring; the **verification discipline** above is what made the output trustworthy.
+- This file is the audit trail: the rules existed *before* the code, and the code was checked *against* the rules at every phase boundary.
