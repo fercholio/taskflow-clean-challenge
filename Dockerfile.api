@@ -1,0 +1,41 @@
+# syntax=docker/dockerfile:1.7
+
+# ---- Build stage ----
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Copy solution + project files first for better layer caching
+COPY TaskFlow.sln ./
+COPY src/TaskFlow.Domain/TaskFlow.Domain.csproj            src/TaskFlow.Domain/
+COPY src/TaskFlow.Application/TaskFlow.Application.csproj  src/TaskFlow.Application/
+COPY src/TaskFlow.Infrastructure/TaskFlow.Infrastructure.csproj src/TaskFlow.Infrastructure/
+COPY src/TaskFlow.Api/TaskFlow.Api.csproj                  src/TaskFlow.Api/
+COPY tests/TaskFlow.Domain.Tests/TaskFlow.Domain.Tests.csproj                 tests/TaskFlow.Domain.Tests/
+COPY tests/TaskFlow.Application.Tests/TaskFlow.Application.Tests.csproj       tests/TaskFlow.Application.Tests/
+COPY tests/TaskFlow.Infrastructure.Tests/TaskFlow.Infrastructure.Tests.csproj tests/TaskFlow.Infrastructure.Tests/
+COPY tests/TaskFlow.Api.Tests/TaskFlow.Api.Tests.csproj                       tests/TaskFlow.Api.Tests/
+
+RUN dotnet restore src/TaskFlow.Api/TaskFlow.Api.csproj
+
+# Copy the rest of the sources and publish
+COPY src/ src/
+COPY db/  db/
+RUN dotnet publish src/TaskFlow.Api/TaskFlow.Api.csproj \
+    -c Release \
+    -o /app/publish \
+    --no-restore \
+    /p:UseAppHost=false
+
+# ---- Runtime stage ----
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+
+ENV ASPNETCORE_URLS=http://+:8080 \
+    ASPNETCORE_ENVIRONMENT=Production \
+    DOTNET_RUNNING_IN_CONTAINER=true
+
+COPY --from=build /app/publish ./
+COPY --from=build /src/db ./db
+
+EXPOSE 8080
+ENTRYPOINT ["dotnet", "TaskFlow.Api.dll"]

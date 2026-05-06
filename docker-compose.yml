@@ -1,0 +1,64 @@
+name: taskflow
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: taskflow-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-taskflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-taskflow}
+      POSTGRES_DB: ${POSTGRES_DB:-taskflow}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-taskflow} -d ${POSTGRES_DB:-taskflow}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks: [taskflow]
+
+  api:
+    image: taskflow-api:local
+    container_name: taskflow-api
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Postgres: Host=postgres;Port=5432;Database=${POSTGRES_DB:-taskflow};Username=${POSTGRES_USER:-taskflow};Password=${POSTGRES_PASSWORD:-taskflow}
+      Jwt__Issuer: taskflow
+      Jwt__Audience: taskflow-clients
+      Jwt__SigningKey: ${JWT_SIGNING_KEY:-ChangeMe_SuperSecret_DevOnly_Key_MinLen32!!}
+      Jwt__ExpiryMinutes: "60"
+      Cors__AllowedOrigins__0: http://localhost:8080
+      Cors__AllowedOrigins__1: http://localhost:5173
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "5092:8080"
+    networks: [taskflow]
+
+  web:
+    image: taskflow-web:local
+    container_name: taskflow-web
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+      args:
+        VITE_API_BASE_URL: /api/v1
+    depends_on:
+      - api
+    ports:
+      - "8080:80"
+    networks: [taskflow]
+
+networks:
+  taskflow:
+    driver: bridge
+
+volumes:
+  postgres-data:

@@ -1,0 +1,33 @@
+## Git
+.git
+.gitignore
+.gitattributes
+
+## .NET build outputs
+**/bin
+**/obj
+**/.vs
+**/*.user
+
+## Node / SPA
+**/node_modules
+**/dist
+**/.vite
+**/*.tsbuildinfo
+src/TaskFlow.Web/vite.config.js
+src/TaskFlow.Web/vite.config.d.ts
+
+## Tests
+**/TestResults
+**/coverage*
+
+## Docs / misc
+docs
+README.md
+*.md
+.github
+docker-compose*.yml
+Dockerfile*
+.env
+.env.*
+!.env.example
