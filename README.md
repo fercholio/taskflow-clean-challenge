@@ -1,6 +1,6 @@
 # TaskFlow — Clean Architecture Technical Challenge
 
-[![CI](https://github.com/Fercho/taskflow-clean-challenge/actions/workflows/ci.yml/badge.svg)](https://github.com/Fercho/taskflow-clean-challenge/actions/workflows/ci.yml)
+[![CI](https://github.com/fercholio/taskflow-clean-challenge/actions/workflows/ci.yml/badge.svg)](https://github.com/fercholio/taskflow-clean-challenge/actions/workflows/ci.yml)
 
 A small Task Management system built as a .NET technical interview exercise — designed to be **read in 5 minutes** and **run with one command**.
 
@@ -17,9 +17,11 @@ A small Task Management system built as a .NET technical interview exercise — 
 
 ## Quick links
 
+- 🎬 **Demo script + setup → [`SETUP.md`](SETUP.md)**
 - 📖 User story → [`docs/USER-STORY.md`](docs/USER-STORY.md)
 - 🏛️ Architecture + ADRs → [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 - 🤖 GenAI process → [`docs/GENAI.md`](docs/GENAI.md)
+- ✅ Verification report → [`docs/PHASE-9-VERIFICATION.md`](docs/PHASE-9-VERIFICATION.md)
 - 📋 Roadmap (planning artefact) → [`docs/ROADMAP.md`](docs/ROADMAP.md)
 - ⚙️ Repo-wide Copilot rules → [`.github/copilot-instructions.md`](.github/copilot-instructions.md)
 

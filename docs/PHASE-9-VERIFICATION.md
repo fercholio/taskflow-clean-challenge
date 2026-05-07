@@ -1,6 +1,6 @@
 # Phase 9 — Verification Report
 
-> **Purpose.** Prove to the panel that everything generated with GenAI assistance during Phases 0–8 is not just *written*, but **builds, tests green, formats clean, and runs**. GenAI is only credible when it is paired with verification evidence.
+> **Purpose.** Prove that everything generated with GenAI assistance during Phases 0–8 is not just *written*, but **builds, tests green, formats clean, and runs**. GenAI is only credible when it is paired with verification evidence.
 
 **Date:** 2026-05-05
 **Branch / tag:** `main` @ `v1.0.0` (commit `b06c079`)
@@ -83,7 +83,7 @@ Seeded demo credentials (`db/migrations` via `DbUp` bootstrapper at API startup)
 
 1. **Generation is cheap; verification is the contract.** Every AI-assisted change in Phases 0–8 went through: failing test → implementation → green test → `dotnet format` → commit. The numbers above are the receipts.
 2. **Constraints survived AI temptation.** The model offered EF Core / MediatR shortcuts repeatedly; they were rejected because Section 2 of `copilot-instructions.md` is non-negotiable and the verification battery would have caught regressions.
-3. **The panel can reproduce this in < 5 minutes** by running the table in §2 — no trust required, only `dotnet` and `npm`.
+3. **Anyone can reproduce this in < 5 minutes** by running the table in §2 — no trust required, only `dotnet` and `npm`.
 
 ---
 
@@ -95,4 +95,4 @@ Seeded demo credentials (`db/migrations` via `DbUp` bootstrapper at API startup)
 
 ---
 
-**Conclusion.** All Phase 0–8 deliverables are present, build clean, test green, format clean, and run via Docker Compose. The repository is at `v1.0.0` and ready for panel review.
+**Conclusion.** All Phase 0–8 deliverables are present, build clean, test green, format clean, and run via Docker Compose. The repository is at `v1.0.0` and ready for review.

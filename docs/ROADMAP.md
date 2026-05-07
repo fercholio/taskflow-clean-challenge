@@ -149,7 +149,7 @@
 
 ## Phase 7 — Documentation + presentation (≈ 1.5 h)
 
-**Goal:** Make the panel love you in 5 minutes.
+**Goal:** make the project understandable in 5 minutes of reading.
 
 - [ ] `README.md` (top-level) sections:
   1. **Project & user story** (the informal story you invented — 1 paragraph).
@@ -181,7 +181,7 @@
 
 ## Phase 9 — Verification & GenAI guardrail (≈ 30 min)
 
-**Goal:** prove to the panel that GenAI was used to *build* **and** to *verify*. Generation without verification is speculation.
+**Goal:** prove that GenAI was used to *build* **and** to *verify*. Generation without verification is speculation.
 
 - [ ] Re-run the verification battery from `.github/copilot-instructions.md` §10:
   - `dotnet build TaskFlow.sln -c Release` → 0 warnings / 0 errors
@@ -194,7 +194,7 @@
 - [ ] Update `docs/JOURNAL.md` with the verification checkpoint.
 - [ ] Commit: `docs(phase-9): verification report + GenAI verification guardrail`.
 
-**Exit state:** repo at `v1.0.0` is reproducibly verifiable in < 5 minutes by the panel.
+**Exit state:** repo at `v1.0.0` is reproducibly verifiable in < 5 minutes by anyone with `dotnet`, `npm`, and Docker.
 
 ---
 

@@ -66,11 +66,10 @@ builder.Services.AddCors(o => o.AddPolicy(CorsPolicy, p =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// Swagger is exposed in all environments so the interview panel can explore the API
+// from the docker-compose demo (which runs in Production).
+app.UseSwagger();
+app.UseSwaggerUI(o => o.SwaggerEndpoint("/swagger/v1/swagger.json", "TaskFlow API v1"));
 
 if (!app.Environment.IsEnvironment("Testing"))
 {

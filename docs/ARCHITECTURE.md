@@ -153,7 +153,7 @@ Naming convention: `Method_State_ExpectedBehavior`. AAA layout with blank-line s
 
 ### ADR-004 — Razor MVC view alongside Web API
 **Decision.** Ship one MVC controller (`HomeController`) returning a Razor view at `/`.
-**Why.** The brief asks for "ASP.NET MVC". The view points reviewers at Swagger and the SPA — single landing page.
+**Why.** The brief asks for "ASP.NET MVC". The view points users at Swagger and the SPA — single landing page.
 **Trade-off.** Mixed pipeline (`AddControllersWithViews`); cost is one extra `using` and a `Views/` folder.
 
 ### ADR-005 — Tailwind for the SPA
