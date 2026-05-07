@@ -19,7 +19,6 @@ RUN dotnet restore src/TaskFlow.Api/TaskFlow.Api.csproj
 
 # Copy the rest of the sources and publish
 COPY src/ src/
-COPY db/  db/
 RUN dotnet publish src/TaskFlow.Api/TaskFlow.Api.csproj \
     -c Release \
     -o /app/publish \
@@ -35,7 +34,6 @@ ENV ASPNETCORE_URLS=http://+:8080 \
     DOTNET_RUNNING_IN_CONTAINER=true
 
 COPY --from=build /app/publish ./
-COPY --from=build /src/db ./db
 
 EXPOSE 8080
 ENTRYPOINT ["dotnet", "TaskFlow.Api.dll"]
